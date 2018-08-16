@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,7 +12,7 @@
 #include <cutils/android_filesystem_config.h>
 #include <cutils/multiuser.h>
 
-#include <selinux/android.h>
+#include <selinux/label.h>
 #include <selinux/avc.h>
 
 #include "binder.h"
@@ -59,10 +60,11 @@ int str16eq(const uint16_t *a, const char *b)
 }
 
 static char *service_manager_context;
-static struct selabel_handle* sehandle;
+//static struct selabel_handle* sehandle;
 
 static bool check_mac_perms(pid_t spid, const char* sid, uid_t uid, const char *tctx, const char *perm, const char *name)
 {
+    return true;
     char *lookup_sid = NULL;
     const char *class = "service_manager";
     bool allowed;
@@ -98,15 +100,15 @@ static bool check_mac_perms_from_lookup(pid_t spid, const char* sid, uid_t uid, 
     bool allowed;
     char *tctx = NULL;
 
-    if (!sehandle) {
-        ALOGE("SELinux: Failed to find sehandle. Aborting service_manager.\n");
-        abort();
-    }
+//    if (!sehandle) {
+//        ALOGE("SELinux: Failed to find sehandle. Aborting service_manager.\n");
+//        abort();
+//    }
 
-    if (selabel_lookup(sehandle, &tctx, name, 0) != 0) {
-        ALOGE("SELinux: No match for %s in service_contexts.\n", name);
-        return false;
-    }
+//    if (selabel_lookup(sehandle, &tctx, name, 0) != 0) {
+//        ALOGE("SELinux: No match for %s in service_contexts.\n", name);
+//        return false;
+//    }
 
     allowed = check_mac_perms(spid, sid, uid, tctx, perm, name);
     freecon(tctx);
@@ -117,9 +119,9 @@ static int svc_can_register(const uint16_t *name, size_t name_len, pid_t spid, c
 {
     const char *perm = "add";
 
-    if (multiuser_get_app_id(uid) >= AID_APP) {
-        return 0; /* Don't allow apps to register services */
-    }
+//    if (multiuser_get_app_id(uid) >= AID_APP) {
+//        return 0; /* Don't allow apps to register services */
+//    }
 
     return check_mac_perms_from_lookup(spid, sid, uid, perm, str8(name, name_len)) ? 1 : 0;
 }
@@ -292,17 +294,17 @@ int svcmgr_handler(struct binder_state *bs,
         return -1;
     }
 
-    if (sehandle && selinux_status_updated() > 0) {
-#ifdef VENDORSERVICEMANAGER
-        struct selabel_handle *tmp_sehandle = selinux_android_vendor_service_context_handle();
-#else
-        struct selabel_handle *tmp_sehandle = selinux_android_service_context_handle();
-#endif
-        if (tmp_sehandle) {
-            selabel_close(sehandle);
-            sehandle = tmp_sehandle;
-        }
-    }
+//    if (sehandle && selinux_status_updated() > 0) {
+//#ifdef VENDORSERVICEMANAGER
+//        struct selabel_handle *tmp_sehandle = selinux_android_vendor_service_context_handle();
+//#else
+//        struct selabel_handle *tmp_sehandle = selinux_android_service_context_handle();
+//#endif
+//        if (tmp_sehandle) {
+//            selabel_close(sehandle);
+//            sehandle = tmp_sehandle;
+//        }
+//    }
 
     switch(txn->code) {
     case SVC_MGR_GET_SERVICE:
@@ -411,29 +413,29 @@ int main(int argc, char** argv)
 
     cb.func_audit = audit_callback;
     selinux_set_callback(SELINUX_CB_AUDIT, cb);
-#ifdef VENDORSERVICEMANAGER
-    cb.func_log = selinux_vendor_log_callback;
-#else
-    cb.func_log = selinux_log_callback;
-#endif
-    selinux_set_callback(SELINUX_CB_LOG, cb);
+//#ifdef VENDORSERVICEMANAGER
+//    cb.func_log = selinux_vendor_log_callback;
+//#else
+//    cb.func_log = selinux_log_callback;
+//#endif
+//    selinux_set_callback(SELINUX_CB_LOG, cb);
 
-#ifdef VENDORSERVICEMANAGER
-    sehandle = selinux_android_vendor_service_context_handle();
-#else
-    sehandle = selinux_android_service_context_handle();
-#endif
+//#ifdef VENDORSERVICEMANAGER
+//    sehandle = selinux_android_vendor_service_context_handle();
+//#else
+//    sehandle = selinux_android_service_context_handle();
+//#endif
     selinux_status_open(true);
 
-    if (sehandle == NULL) {
-        ALOGE("SELinux: Failed to acquire sehandle. Aborting.\n");
-        abort();
-    }
+//    if (sehandle == NULL) {
+//        ALOGE("SELinux: Failed to acquire sehandle. Aborting.\n");
+//        abort();
+//    }
 
-    if (getcon(&service_manager_context) != 0) {
-        ALOGE("SELinux: Failed to acquire service_manager context. Aborting.\n");
-        abort();
-    }
+//    if (getcon(&service_manager_context) != 0) {
+//        ALOGE("SELinux: Failed to acquire service_manager context. Aborting.\n");
+//        abort();
+//    }
 
 
     binder_loop(bs, svcmgr_handler);

@@ -28,6 +28,7 @@
 #include <utils/Vector.h>
 
 #include <getopt.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -38,7 +39,7 @@
 #include <memory>
 
 #include "selinux/selinux.h"
-#include "selinux/android.h"
+//#include "selinux/android.h"
 
 #include "cmd.h"
 
@@ -106,7 +107,7 @@ public:
         if (fd < 0) {
             return fd;
         }
-        if (is_selinux_enabled() && seLinuxContext.size() > 0) {
+        if (false && is_selinux_enabled() && seLinuxContext.size() > 0) {
             String8 seLinuxContext8(seLinuxContext);
             security_context_t tmp = nullptr;
             getfilecon(fullPath.string(), &tmp);
