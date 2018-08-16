@@ -80,7 +80,7 @@ static bool check_mac_perms(pid_t spid, const char* sid, uid_t uid, const char *
     ad.name = name;
 
     if (sid == NULL) {
-        android_errorWriteLog(0x534e4554, "121035042");
+//        android_errorWriteLog(0x534e4554, "121035042");
     }
 
     int result = selinux_check_access(sid ? sid : lookup_sid, tctx, class, perm, (void *) &ad);

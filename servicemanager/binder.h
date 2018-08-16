@@ -4,8 +4,11 @@
 #ifndef _BINDER_H_
 #define _BINDER_H_
 
+#include <stdint.h>
 #include <linux/android/binder.h>
 #include <sys/ioctl.h>
+
+#define __unused __attribute__((__unused__))
 
 struct binder_state;
 

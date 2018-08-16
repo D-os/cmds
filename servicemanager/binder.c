@@ -154,7 +154,7 @@ int binder_become_context_manager(struct binder_state *bs)
 
     // fallback to original method
     if (result != 0) {
-        android_errorWriteLog(0x534e4554, "121035042");
+//        android_errorWriteLog(0x534e4554, "121035042");
 
         result = ioctl(bs->fd, BINDER_SET_CONTEXT_MGR, 0);
     }
