@@ -1,0 +1,11 @@
+[Unit]
+Description=Binder Service Manager
+After=syslog.target
+
+[Service]
+ExecStart=/usr/local/sbin/servicemanager /dev/binder
+KillMode=process
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
