@@ -3,6 +3,7 @@ add_executable(bctest
     "binder.c"
 )
 target_link_libraries(bctest cutils)
+add_test(NAME bctest COMMAND bctest)
 
 add_definitions("-DEXCLUDE_FS_CONFIG_STRUCTURES")
 add_executable(servicemanager
